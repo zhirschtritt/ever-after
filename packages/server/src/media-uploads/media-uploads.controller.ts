@@ -1,23 +1,35 @@
 import {
   Controller,
+  Get,
+  HttpException,
+  Inject,
+  Param,
   Post,
-  Req,
-  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { Response, Request } from 'express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { PRISMA_SERVICE, PrismaService } from '../prisma';
 
-@Controller('media')
-export class MediaController {
+@Controller('media-uploads')
+export class MediaUploadsController {
   constructor(
-    @InjectPinoLogger(MediaController.name) private readonly logger: PinoLogger,
+    @InjectPinoLogger(MediaUploadsController.name)
+    private readonly logger: PinoLogger,
     private readonly cloudinaryService: CloudinaryService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
   ) {}
+
+  @Get(':id')
+  async getUploadById(@Param('id') id: string) {
+    return this.prisma.uploads.findUnique({
+      where: { id },
+      rejectOnNotFound: true,
+    });
+  }
 
   @Post()
   @UseInterceptors(
@@ -29,17 +41,23 @@ export class MediaController {
   )
   async create(
     @UploadedFile() file: Express.Multer.File,
-    @Req() request: Request,
-    @Res() response: Response,
+    // @Req() request: Request,
   ) {
     try {
       const res = await this.cloudinaryService.uploadFile(file);
 
+      const mediaUpload = await this.prisma.uploads.create({
+        data: {
+          cloudinaryPublicId: res.public_id,
+          cloudinaryUrl: res.secure_url,
+        },
+      });
+
       this.logger.debug({ res }, 'Uploaded file');
-      return res;
+      return mediaUpload;
     } catch (error) {
       if (error.http_code) {
-        response.status(error.http_code);
+        throw new HttpException('Cloudinary upload error', error.http_code);
       }
 
       throw error;

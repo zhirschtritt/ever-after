@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { LoggerModule } from 'nestjs-pino';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MediaController } from './media/media.controller';
-import { MediaModule } from './media/media.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
-import { LoggerModule } from 'nestjs-pino';
+import { MediaUploadsController } from './media-uploads/media-uploads.controller';
+import { MediaModule } from './media-uploads/media-uploads.module';
+import { PrismaModule } from './prisma';
 
 @Module({
   imports: [
@@ -14,8 +16,9 @@ import { LoggerModule } from 'nestjs-pino';
     CloudinaryModule,
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
     LoggerModule.forRoot({ pinoHttp: { autoLogging: false, level: 'debug' } }),
+    PrismaModule,
   ],
-  controllers: [AppController, MediaController],
+  controllers: [AppController, MediaUploadsController],
   providers: [AppService],
 })
 export class AppModule {}

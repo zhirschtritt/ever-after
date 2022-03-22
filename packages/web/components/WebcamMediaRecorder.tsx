@@ -2,21 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import useMediaRecorder from "@wmik/use-media-recorder";
 import { Button, Container, Group } from "@mantine/core";
 import axios from "axios";
-
-function Player({ srcBlob }: { srcBlob: Blob | null }) {
-  if (!srcBlob) {
-    return null;
-  }
-
-  return (
-    <video
-      src={URL.createObjectURL(srcBlob)}
-      width={520}
-      height={480}
-      controls
-    />
-  );
-}
+import { MediaUpload } from "../interfaces";
+import { useRouter } from "next/router";
 
 function LiveStreamPreview({ stream }: { stream: MediaStream }) {
   let videoPreviewRef = useRef<HTMLVideoElement>(null);
@@ -52,16 +39,21 @@ export default function WebcamMediaRecorder() {
     onStop: () => setUploadVisible(true),
   });
 
-  async function upload() {
-    const data = new FormData();
-    data.append("file", mediaBlob!);
+  const router = useRouter();
 
-    await axios.post("http://localhost:5555/media", data, {
+  async function upload() {
+    const formData = new FormData();
+    formData.append("file", mediaBlob!);
+
+    const res = await axios.post<MediaUpload>("/api/media-uploads", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-    alert("uploaded!");
+
+    console.log(res);
+
+    router.push(`/playback/${res.data.id}`);
   }
 
   useEffect(() => {
