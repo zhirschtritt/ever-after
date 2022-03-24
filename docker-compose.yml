@@ -1,0 +1,36 @@
+version: "3"
+services:
+  nest-api:
+    container_name: ever-after-api
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile
+    ports:
+      - 5555:5555
+    depends_on:
+      - postgres
+    env_file:
+      - ./packages/server/.env
+
+  ever-after-app:
+    container_name: ever-after-app
+    build:
+      context: ./packages/web
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+
+  postgres:
+    image: postgres:13
+    container_name: postgres-ever-after
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:

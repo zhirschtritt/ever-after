@@ -10,9 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Uploads {
+model Upload {
   id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   cloudinaryPublicId String   @map("cloudinary_public_id")
   cloudinaryUrl      String   @map("cloudinary_url")
   createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map(name: "uploads")
 }

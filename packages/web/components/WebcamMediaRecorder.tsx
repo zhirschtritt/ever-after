@@ -45,11 +45,15 @@ export default function WebcamMediaRecorder() {
     const formData = new FormData();
     formData.append("file", mediaBlob!);
 
-    const res = await axios.post<MediaUpload>("/api/media-uploads", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const res = await axios.post<MediaUpload>(
+      `${process.env.NEXT_PUBLIC_API_URL}/media-uploads`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     console.log(res);
 

@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   try {
     const res = await axios.get<MediaUpload>(
-      `http://localhost:5555/media-uploads/${query.id}`
+      `${process.env.NEXT_PUBLIC_API_URL}/media-uploads/${query.id}`
     );
     console.log(res.data);
     data = res.data;

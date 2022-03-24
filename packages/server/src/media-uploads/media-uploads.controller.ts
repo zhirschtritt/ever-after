@@ -25,7 +25,7 @@ export class MediaUploadsController {
 
   @Get(':id')
   async getUploadById(@Param('id') id: string) {
-    return this.prisma.uploads.findUnique({
+    return this.prisma.upload.findUnique({
       where: { id },
       rejectOnNotFound: true,
     });
@@ -46,7 +46,7 @@ export class MediaUploadsController {
     try {
       const res = await this.cloudinaryService.uploadFile(file);
 
-      const mediaUpload = await this.prisma.uploads.create({
+      const mediaUpload = await this.prisma.upload.create({
         data: {
           cloudinaryPublicId: res.public_id,
           cloudinaryUrl: res.secure_url,
