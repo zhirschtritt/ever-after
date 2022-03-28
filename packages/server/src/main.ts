@@ -7,6 +7,7 @@ async function bootstrap() {
     bufferLogs: true,
     cors: true,
   });
+  app.setGlobalPrefix('api');
   app.useLogger(app.get(Logger));
   await app.listen(5555);
 }

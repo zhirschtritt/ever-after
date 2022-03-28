@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   try {
     const res = await axios.get<MediaUpload>(
-      `${process.env.NEXT_PUBLIC_API_URL}/media-uploads/${query.id}`
+      `http://host.docker.internal:5555/api/media-uploads/${query.id}`
     );
     console.log(res.data);
     data = res.data;
